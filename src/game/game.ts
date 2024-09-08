@@ -15,10 +15,11 @@ export class Game {
   private playersGroupedByTeams: Record<TeamName, Player[]>;
   private currentPlayerIdx: number;
   private _currentRound: Round | null;
-  private currentTeam: Team;
-  public readonly deck: Deck;
-  private isStarted: boolean = false;
-  private isEnded: boolean = false;
+  public currentTeam: Team;
+  private readonly deck: Deck;
+  public isStarted: boolean = false;
+  public isEnded: boolean = false;
+  public currentCard: Card;
 
   private static currentGame: Game | null = null;
 
@@ -37,6 +38,7 @@ export class Game {
     const teams: [Team, Team] = [this.teamMad, this.teamGlad];
     this.currentTeam = teams[randIdx];
     this.deck = new Deck(ALL_CARDS);
+    this.currentCard = this.deck.drawCard();
   }
 
   static getOrCreate(): Game {
@@ -59,8 +61,13 @@ export class Game {
   }
 
   public addPlayer(playerName: string): void {
+    if (
+      this.players.find((player) => player.name === playerName) !== undefined
+    ) {
+      return;
+    }
     if (this.isStarted) {
-      throw new Error('Cannot add player to game that has already started');
+      throw new Error('Cannot add   player to game that has already started');
     }
     const teamWithFewerPlayers = this.getTeamWithFewerPlayers();
     const player = new Player(playerName, teamWithFewerPlayers);
@@ -93,7 +100,7 @@ export class Game {
     this._currentRound.on('end', () => this.handleRoundEnd());
   }
 
-  private getPoet(): Player {
+  public getPoet(): Player {
     const poet =
       this.playersGroupedByTeams[this.currentTeam.name][this.currentPlayerIdx];
     if (poet === undefined) {
@@ -118,12 +125,13 @@ export class Game {
       ) {
         this.currentPlayerIdx++;
       }
+      this.currentCard = this.deck.drawCard();
     }
   }
 
-  public drawCard(): Card {
+  public drawCard(): void {
     if (this._currentRound !== null) {
-      return this.deck.drawCard();
+      this.currentCard = this.deck.drawCard();
     } else {
       throw new NoCurrentRoundError();
     }

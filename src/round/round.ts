@@ -15,7 +15,7 @@ export class Round extends EventEmitter<{ end: [] }> {
     this.fullScoreZone = new Zone();
     this.partialScoreZone = new Zone();
     this.failedOrSkippedZone = new Zone();
-    this._timeRemaining = 60;
+    this._timeRemaining = 10;
     this.timer = null;
   }
 

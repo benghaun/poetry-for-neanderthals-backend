@@ -1,4 +1,5 @@
 import { Card } from '../card/card';
+import { Game } from '../game/game';
 
 export class Zone {
   private _cards: Card[];
@@ -9,6 +10,7 @@ export class Zone {
 
   public placeCard(card: Card): void {
     this._cards.push(card);
+    Game.getOrCreate().drawCard();
   }
 
   public get cards(): Card[] {

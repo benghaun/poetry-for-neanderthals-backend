@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Poetry for Neanderthals</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.5/cdn.min.js"
+      defer
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1,
+      h2,
+      h3 {
+        color: #333;
+        text-align: center;
+      }
+      button {
+        background-color: #4caf50;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+        height: 40px;
+        vertical-align: middle;
+      }
+      .error {
+        color: red;
+        text-align: center;
+      }
+      .team-list {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+      }
+      .team {
+        width: 45%;
+      }
+      .team h3 {
+        text-align: center;
+      }
+      .team ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      .team li {
+        background-color: #f0f0f0;
+        margin: 5px 0;
+        padding: 5px;
+        border-radius: 3px;
+      }
+      .scores {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+      }
+      .score {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .current-word,
+      .current-phrase {
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+        margin: 20px 0;
+        padding: 10px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+      }
+      .poet-buttons {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+      }
+      .poet-buttons button {
+        font-size: 18px;
+      }
+      .oops {
+        background-color: #f44336;
+      }
+      .one-point {
+        background-color: #cfd300;
+      }
+      .three-points {
+        background-color: #4caf50;
+      }
+      .join-game-form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+      }
+      .join-game-form input[type='text'] {
+        height: 40px;
+        padding: 5px 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px 0 0 5px;
+        box-sizing: border-box;
+      }
+      .join-game-form button {
+        height: 40px;
+        border-radius: 0 5px 5px 0;
+        margin: 0;
+        vertical-align: middle;
+      }
+      .horizontal-button-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" x-data="game()" x-init="init()">
+      <h1>Poetry for Neanderthals</h1>
+
+      <div x-show="!playerJoined">
+        <h2>Join Game</h2>
+        <div class="join-game-form">
+          <input
+            type="text"
+            x-model="playerName"
+            placeholder="Enter your name"
+          />
+          <button @click="joinGame">Join Game</button>
+        </div>
+        <p class="error" x-text="error"></p>
+      </div>
+
+      <div x-show="playerJoined && !gameState.gameStarted">
+        <h2>Waiting for Game to Start</h2>
+        <div class="team-list">
+          <div class="team">
+            <h3>Team Mad</h3>
+            <ul>
+              <template
+                x-for="player in gameState.teamMadPlayers"
+                :key="player"
+              >
+                <li x-text="player"></li>
+              </template>
+            </ul>
+          </div>
+          <div class="team">
+            <h3>Team Glad</h3>
+            <ul>
+              <template
+                x-for="player in gameState.teamGladPlayers"
+                :key="player"
+              >
+                <li x-text="player"></li>
+              </template>
+            </ul>
+          </div>
+        </div>
+        <div class="horizontal-button-group">
+          <button @click="startGame">Start Game</button>
+        </div>
+      </div>
+
+      <div x-show="gameState.gameStarted">
+        <h2>Your Team: <span x-text="teamName()"></span></h2>
+        <div class="scores">
+          <div class="score">
+            Team Mad: <span x-text="gameState.teamMadScore"></span>
+          </div>
+          <div class="score">
+            Team Glad: <span x-text="gameState.teamGladScore"></span>
+          </div>
+        </div>
+      </div>
+
+      <div x-show="gameState.gameStarted && !gameState.gameEnded">
+
+        <h2 x-show="!gameState.roundActive">
+          Next Team: <span x-text="gameState.currentTeam"></span>
+        </h2>
+        <h3 x-show="!gameState.roundActive">
+          Next Poet: <span x-text="gameState.currentPoet"></span>
+        </h3>
+        <h2 x-show="gameState.roundActive">
+          Current Team: <span x-text="gameState.currentTeam"></span>
+        </h2>
+        <h3 x-show="gameState.roundActive">
+          Current Poet: <span x-text="gameState.currentPoet"></span>
+        </h3>
+        <h3 x-show="gameState.roundActive">
+          Time Left: <span x-text="gameState.timeLeft"></span> seconds
+        </h3>
+
+        <div x-show="canSeeWord()">
+          <div class="current-word">
+            One Point: <span x-text="gameState.partialText"></span>
+          </div>
+          <div class="current-phrase">
+            Three Points: <span x-text="gameState.fullText"></span>
+          </div>
+        </div>
+
+        <div x-show="isPoet() && gameState.roundActive">
+          <p>Describe the word and phrase using only one-syllable words!</p>
+          <div class="poet-buttons">
+            <button @click="oops" class="oops">Oops</button>
+            <button @click="onePoint" class="one-point">One Point</button>
+            <button @click="threePoints" class="three-points">
+              Three Points
+            </button>
+          </div>
+        </div>
+
+        <div
+          x-show="isCurrentTeamMember() && !isPoet() && gameState.roundActive"
+        >
+          <p>
+            Listen to the poet's description and try to guess the word and
+            phrase!
+          </p>
+        </div>
+
+        <div x-show="!isCurrentTeamMember() && gameState.roundActive">
+          <p>
+            The other team is playing. Make sure the poet uses only one-syllable
+            words and does not use any word on the card!
+          </p>
+        </div>
+
+        <div class="horizontal-button-group">
+          <button @click="startRound" x-show="!gameState.roundActive">
+            Start Round
+          </button>
+        </div>
+      </div>
+
+      <h2 x-show="gameState.gameEnded">
+        Game over: <span x-text="gameEndText"></span></span>
+      </h2>
+    </div>
+
+    <script>
+      function game() {
+        return {
+          playerJoined: false,
+          playerName: '',
+          gameState: {
+            gameStarted: false,
+            teamMadPlayers: [],
+            teamGladPlayers: [],
+            teamMadScore: 0,
+            teamGladScore: 0,
+            currentTeam: '',
+            currentPoet: '',
+            timeLeft: 0,
+            partialText: '',
+            fullText: '',
+            roundActive: false,
+          },
+
+          error: '',
+          apiBaseUrl: '/v1',
+
+          init() {
+            this.pollGameState();
+          },
+
+          teamName() {
+            return this.gameState.teamMadPlayers.includes(this.playerName)
+            ? 'Mad'
+            : 'Glad';
+          },
+
+          gameEndText() {
+            if (this.gameState.teamMadScore > this.gameState.teamGladScore) {
+              return 'Team Mad wins!'
+            } else if (this.gameState.teamGladScore > this.gameState.teamMadScore) {
+              return 'Team Glad wins!'
+            } else {
+              return "It's a tie!"
+            }
+          },
+
+          async joinGame() {
+            try {
+              await axios.post(`${this.apiBaseUrl}/game/join`, {
+                playerName: this.playerName,
+              });
+              this.playerJoined = true;
+              this.error = '';
+            } catch (error) {
+              this.error = 'Failed to join game. Please try again.';
+              console.error('Error joining game:', error);
+            }
+          },
+
+          async pollGameState() {
+            setInterval(async () => {
+              if (this.playerJoined) {
+                try {
+                  const response = await axios.get(
+                    `${this.apiBaseUrl}/game/state`,
+                  );
+                  this.gameState = response.data;
+                } catch (error) {
+                  console.error('Error fetching game state:', error);
+                }
+              }
+            }, 1000); // Poll every second
+          },
+
+          async startGame() {
+            try {
+              await axios.post(`${this.apiBaseUrl}/game/start`);
+            } catch (error) {
+              console.error('Error starting game:', error);
+            }
+          },
+
+          async startRound() {
+            if (!this.gameState.gameStarted) return;
+            try {
+              await axios.post(`${this.apiBaseUrl}/round/start`);
+            } catch (error) {
+              console.error('Error starting round:', error);
+            }
+          },
+
+          async oops() {
+            try {
+              await axios.post(`${this.apiBaseUrl}/round/oops`);
+            } catch (error) {
+              console.error('Error registering oops:', error);
+            }
+          },
+
+          async onePoint() {
+            try {
+              await axios.post(`${this.apiBaseUrl}/round/one-point`);
+            } catch (error) {
+              console.error('Error registering one point:', error);
+            }
+          },
+
+          async threePoints() {
+            try {
+              await axios.post(`${this.apiBaseUrl}/round/three-points`);
+            } catch (error) {
+              console.error('Error registering three points:', error);
+            }
+          },
+
+          isPoet() {
+            return this.playerName === this.gameState.currentPoet;
+          },
+
+          isCurrentTeamMember() {
+            return (
+              (this.gameState.currentTeam === 'Mad' &&
+                this.gameState.teamMadPlayers.includes(this.playerName)) ||
+              (this.gameState.currentTeam === 'Glad' &&
+                this.gameState.teamGladPlayers.includes(this.playerName))
+            );
+          },
+
+          canSeeWord() {
+            const isAllowed = this.isPoet() || !this.isCurrentTeamMember();
+            return isAllowed && this.gameState.roundActive;
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
