@@ -92,11 +92,35 @@
       }
       .poet-buttons {
         display: flex;
-        justify-content: space-around;
+        justify-content: center;
         margin-top: 20px;
+        align-items: center;
+        flex-wrap:wrap
       }
       .poet-buttons button {
         font-size: 18px;
+        width: 30%;
+      }
+      .poet-buttons span {
+        width: 30%;
+        text-align: center;
+      }
+      .non-poet-view {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        align-items: center;
+        flex-wrap:wrap
+      }
+      .non-poet-view span {
+        width: 30%;
+        text-align: center;
+      }
+      .mad {
+        color: #f44636;
+      }
+      .glad {
+        color: #4caf50;
       }
       .oops {
         background-color: #f44336;
@@ -155,7 +179,7 @@
         <h2>Waiting for Game to Start</h2>
         <div class="team-list">
           <div class="team">
-            <h3>Team Mad</h3>
+            <h3 class="mad">Team Mad</h3>
             <ul>
               <template
                 x-for="player in gameState.teamMadPlayers"
@@ -166,7 +190,7 @@
             </ul>
           </div>
           <div class="team">
-            <h3>Team Glad</h3>
+            <h3 class="glad">Team Glad</h3>
             <ul>
               <template
                 x-for="player in gameState.teamGladPlayers"
@@ -186,10 +210,10 @@
         <h2>Your Team: <span x-text="teamName()"></span></h2>
         <div class="scores">
           <div class="score">
-            Team Mad: <span x-text="gameState.teamMadScore"></span>
+            <span class="mad">Team Mad:</span> <span class="mad" x-text="gameState.teamMadScore"></span>
           </div>
           <div class="score">
-            Team Glad: <span x-text="gameState.teamGladScore"></span>
+            <span class="glad">Team Glad:</span> <span class="glad" x-text="gameState.teamGladScore"></span>
           </div>
         </div>
       </div>
@@ -229,6 +253,9 @@
             <button @click="threePoints" class="three-points">
               Three Points
             </button>
+            <span x-text="gameState.roundStats.oops"></span>
+            <span x-text="gameState.roundStats.onePoint"></span>
+            <span x-text="gameState.roundStats.threePoints"></span>
           </div>
         </div>
 
@@ -246,6 +273,15 @@
             The other team is playing. Make sure the poet uses only one-syllable
             words and does not use any word on the card!
           </p>
+        </div>
+
+        <div x-show="!isPoet() && gameState.roundActive" class="non-poet-view">
+          <span class="oops">Oops</span>
+          <span class="one-point">One Point</span>
+          <span class="three-points">Three Points</span>
+          <span x-text="gameState.roundStats.oops"></span>
+          <span x-text="gameState.roundStats.onePoint"></span>
+          <span x-text="gameState.roundStats.threePoints"></span>
         </div>
 
         <div class="horizontal-button-group">

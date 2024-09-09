@@ -38,6 +38,7 @@ export class Game {
     const teams: [Team, Team] = [this.teamMad, this.teamGlad];
     this.currentTeam = teams[randIdx];
     this.deck = new Deck(ALL_CARDS);
+    this.deck.shuffle();
     this.currentCard = this.deck.drawCard();
   }
 
@@ -67,7 +68,7 @@ export class Game {
       return;
     }
     if (this.isStarted) {
-      throw new Error('Cannot add   player to game that has already started');
+      throw new Error('Cannot add player to game that has already started');
     }
     const teamWithFewerPlayers = this.getTeamWithFewerPlayers();
     const player = new Player(playerName, teamWithFewerPlayers);
