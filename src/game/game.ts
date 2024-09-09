@@ -81,7 +81,6 @@ export class Game {
     }
     shuffle(this.playersGroupedByTeams['Glad']);
     shuffle(this.playersGroupedByTeams['Mad']);
-    this.deck.shuffle();
     this.isStarted = true;
   }
 
@@ -94,6 +93,7 @@ export class Game {
         'Previous round has not yet ended, cannot start new round',
       );
     }
+    this.deck.shuffle();
     const poet = this.getPoet();
     this._currentRound = new Round(poet);
     this._currentRound.start();

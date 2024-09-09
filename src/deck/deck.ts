@@ -2,7 +2,7 @@ import { shuffle } from 'lodash';
 import { Card } from '../card/card';
 
 export class Deck {
-  constructor(private readonly cards: Card[]) {}
+  constructor(private cards: Card[]) {}
 
   public drawCard(): Card {
     const topCard = this.cards.pop();
@@ -13,6 +13,6 @@ export class Deck {
   }
 
   public shuffle(): void {
-    shuffle(this.cards);
+    this.cards = shuffle(this.cards);
   }
 }
