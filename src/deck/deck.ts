@@ -15,4 +15,8 @@ export class Deck {
   public shuffle(): void {
     this.cards = shuffle(this.cards);
   }
+
+  public placeCardOnTop(card: Card): void {
+    this.cards.push(card);
+  }
 }

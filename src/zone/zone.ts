@@ -24,4 +24,8 @@ export class Zone {
   public empty(): void {
     this._cards = [];
   }
+
+  public removeLastCard(): Card | null {
+    return this._cards.pop() ?? null;
+  }
 }

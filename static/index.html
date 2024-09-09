@@ -131,6 +131,11 @@
       .three-points {
         background-color: #4caf50;
       }
+      .undo {
+        background-color: #808080;
+        align-self: center;
+        margin-top: 20px;
+      }
       .join-game-form {
         display: flex;
         justify-content: center;
@@ -256,6 +261,7 @@
             <span x-text="gameState.roundStats.oops"></span>
             <span x-text="gameState.roundStats.onePoint"></span>
             <span x-text="gameState.roundStats.threePoints"></span>
+            <button @click="undo" class="undo">Undo</button>
           </div>
         </div>
 
@@ -404,6 +410,14 @@
               await axios.post(`${this.apiBaseUrl}/round/three-points`);
             } catch (error) {
               console.error('Error registering three points:', error);
+            }
+          },
+
+          async undo() {
+            try {
+              await axios.post(`${this.apiBaseUrl}/game/undo`);
+            }catch (error) {
+              console.error('Error during undo:', error);
             }
           },
 

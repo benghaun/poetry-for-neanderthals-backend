@@ -141,4 +141,16 @@ export class Game {
   public get currentRound(): Round | null {
     return this._currentRound;
   }
+
+  public undo(): void {
+    if (this._currentRound === null) {
+      return;
+    }
+    const lastCard = this._currentRound.undo();
+    if (lastCard === null) {
+      return;
+    }
+    this.deck.placeCardOnTop(this.currentCard);
+    this.currentCard = lastCard;
+  }
 }

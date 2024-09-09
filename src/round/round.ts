@@ -9,14 +9,16 @@ export class Round extends EventEmitter<{ end: [] }> {
   public readonly failedOrSkippedZone: Zone;
   private _timeRemaining: number;
   private timer: NodeJS.Timeout | null;
+  private history: Zone[];
 
   constructor(public readonly poet: Player) {
     super();
     this.fullScoreZone = new Zone();
     this.partialScoreZone = new Zone();
     this.failedOrSkippedZone = new Zone();
-    this._timeRemaining = 10;
+    this._timeRemaining = 60;
     this.timer = null;
+    this.history = [];
   }
 
   public start(): void {
@@ -46,13 +48,24 @@ export class Round extends EventEmitter<{ end: [] }> {
 
   public placeFullScoreCard(card: Card): void {
     this.fullScoreZone.placeCard(card);
+    this.history.push(this.fullScoreZone);
   }
 
   public placePartialScoreCard(card: Card): void {
     this.partialScoreZone.placeCard(card);
+    this.history.push(this.partialScoreZone);
   }
 
   public placeFailedOrSkippedCard(card: Card): void {
     this.failedOrSkippedZone.placeCard(card);
+    this.history.push(this.failedOrSkippedZone);
+  }
+
+  public undo(): Card | null {
+    const lastZone = this.history.pop();
+    if (!lastZone) {
+      return null;
+    }
+    return lastZone.removeLastCard();
   }
 }

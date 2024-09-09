@@ -51,4 +51,9 @@ export class GameController {
   public start(): void {
     Game.getOrCreate().startGame();
   }
+
+  @Post('undo')
+  public undo(): void {
+    Game.getOrCreate().undo();
+  }
 }
