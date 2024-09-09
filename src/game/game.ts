@@ -80,6 +80,9 @@ export class Game {
     if (this.isStarted) {
       throw new Error('Cannot start game that has already started');
     }
+    if (this.players.length < 2) {
+      throw new Error('Cannot start game with fewer than 2 players');
+    }
     shuffle(this.playersGroupedByTeams['Glad']);
     shuffle(this.playersGroupedByTeams['Mad']);
     this.isStarted = true;

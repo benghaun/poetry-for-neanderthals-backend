@@ -207,7 +207,7 @@
           </div>
         </div>
         <div class="horizontal-button-group">
-          <button @click="startGame">Start Game</button>
+          <button @click="startGame" x-show="gameState.teamGladPlayers.length + gameState.teamMadPlayers.length > 1">Start Game</button>
         </div>
       </div>
 
@@ -369,7 +369,7 @@
                   console.error('Error fetching game state:', error);
                 }
               }
-            }, 1000); // Poll every second
+            }, 500); // Poll every half a second
           },
 
           async startGame() {
